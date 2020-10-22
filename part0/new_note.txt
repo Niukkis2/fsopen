@@ -1,0 +1,15 @@
+title new note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+
+note over server:
+server processes the request and
+adds the new note to the array of notes
+end note
+
+browser->server: HTTP GET /main.css
+server->browser: main.css
+browser->server: HTTP GET /main.js
+server->browser: main.js
+browser->server: HTTP GET /data.json
+server->browser: data.json

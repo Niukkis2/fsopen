@@ -1,0 +1,17 @@
+title new note spa
+
+note over browser:
+user submits a new note to display
+end note
+note over browser:
+browser executes JS-code that creates
+a new note and pushes it to the list of notes
+end note
+
+note over browser:
+browser re-renders the webpage and
+the new note is sent to the server
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: {"message":"note created"}
