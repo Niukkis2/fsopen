@@ -105,7 +105,7 @@ const App = () => {
     setMatcher(event.target.value)
   }
   if (!resolved && !weatherResolved) {
-    return <div>Fetching country data...</div>
+    return <div>Fetching data...</div>
   }
   return (
     <div>
