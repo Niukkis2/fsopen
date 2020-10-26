@@ -3,12 +3,15 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
+import Message from './components/Message'
 
 function App() {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [matcher, setMatcher] = useState('')
+  const [message, setMessage] = useState(null)
+  const [className, setClassName] = useState('')
 
   useEffect(() => {
     personService
@@ -29,15 +32,22 @@ function App() {
   }
 
   const handleClick = (name, id) => {
-    console.log('name: ', name)
-    console.log('id: ', id)
     if (window.confirm(`Delete ${name}?`)) {
       personService
       .deleteItem(id)
       .then(
         personService.getAll()
         .then(persons => setPersons(persons))
-      )
+      ).catch(error => {
+        setMessage(
+          `Information of ${name} had already been removed from server`
+        )
+        setClassName('error')
+        setTimeout(() => {
+          setMessage(null)
+          setClassName('')
+        }, 2000)
+      })
     }
   }
 
@@ -48,6 +58,15 @@ function App() {
         .update(person.id, personNewNumber)
         .then(response => {
           setPersons(persons.map(p => p.id !== response.id ? p : response))
+        })
+        .catch(error => {
+          setMessage(`Information of ${person.name} has already been removed from server`)
+          setClassName('error')
+          setTimeout(() => {
+            setMessage(null)
+            setClassName('')
+          }, 2000)
+          setPersons(persons.filter(p => p.id !== person.id))
         })
     }
   }
@@ -69,6 +88,12 @@ function App() {
             .getAll()
             .then(persons => setPersons(persons))
         })
+        setMessage(`Added ${nameObject.name}`)
+        setClassName('success')
+        setTimeout(() => {
+          setMessage(null)
+          setClassName('')
+        }, 2000)
     }
     setNewName('')
     setNewNumber('')
@@ -77,6 +102,7 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message message={message} className={className}/>
       <Filter matcher={matcher} onMatcherChange={handleMatcherChange} />
       <h3>add a new</h3>
       <PersonForm onSubmit={addPerson}
