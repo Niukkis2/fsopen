@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
-import axios from 'axios'
+import personService from './services/persons'
 
 function App() {
   const [persons, setPersons] = useState([])
@@ -11,12 +11,12 @@ function App() {
   const [matcher, setMatcher] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => setPersons(response.data))
+    personService
+      .getAll()
+      .then(persons => setPersons(persons))
   }, [])
 
-  function handleNumberChange(event) {
+  const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
   }
 
@@ -28,18 +28,50 @@ function App() {
     setMatcher(event.target.value)
   }
 
+  const handleClick = (name, id) => {
+    console.log('name: ', name)
+    console.log('id: ', id)
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+      .deleteItem(id)
+      .then(
+        personService.getAll()
+        .then(persons => setPersons(persons))
+      )
+    }
+  }
+
+  const updateNumber = (person) => {
+    if (window.confirm(`${person.name} is already added to the phonebook, replace the old number with a new one?`)) {
+      const personNewNumber = {name: person.name, number: newNumber, id: person.id}
+      personService
+        .update(person.id, personNewNumber)
+        .then(response => {
+          setPersons(persons.map(p => p.id !== response.id ? p : response))
+        })
+    }
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     const nameObject = {
       name: newName,
       number: newNumber
     }
-    if (persons.filter(o => o.name === nameObject.name).length > 0) {
-      window.alert(`${nameObject.name} is already added to the phonebook`)
+    const filtered = persons.filter(o => o.name === nameObject.name)
+    if (filtered.length === 1) {
+      updateNumber(filtered[0])
     } else {
-      setPersons(persons.concat(nameObject))
+      personService
+        .create(nameObject)
+        .then(() => {
+          personService
+            .getAll()
+            .then(persons => setPersons(persons))
+        })
     }
     setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -53,7 +85,9 @@ function App() {
                   number={newNumber}
                   onNumberChange={handleNumberChange}/>
       <h3>Numbers</h3>
-      <Persons persons={persons} matcher={matcher} />
+      <Persons persons={persons} 
+               matcher={matcher}
+               onClick={handleClick} />
     </div>
   )
 }
