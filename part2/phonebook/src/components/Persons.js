@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 const Persons = (props) => {
   if (props.matcher === '') {
     return (
-      props.persons.map((p) => 
-        <li key={p.id}>
-        {p.name} {p.number} <button onClick={() => props.onClick(p.name, p.id)} key={p.id}>delete</button>
+      props.persons.map(p => 
+        <li className='person' key={p.id}>
+        {p.name} {p.number} 
+        <button onClick={() => props.onClick(p.name, p.id)} key={p.id}>delete</button>
         </li>)
     )
   }
@@ -16,8 +17,8 @@ const Persons = (props) => {
     )
   } else {
     return (
-      filtered.map((p, i) => 
-      <li key={i}>
+      filtered.map(p => 
+      <li className='person' key={p.id}>
         {p.name} {p.number}
       </li>)
     )
